@@ -1,0 +1,51 @@
+- invoice: 110
+  client: "Juan Francisco Cardona"
+  alpha: [a,b,c]
+  items:
+     - item: 1100
+       unitvalue: 1000.00
+       units: 1
+       trans:
+        - in: a
+          next: B
+        - in: c
+          next: C
+     - item: 1200
+       unitvalue: 200.10
+       units: 100
+       trans:
+        - in: b
+          next: A
+- invoice: 120
+  client: "Daniel Camilo Vergara Marin"
+  alpha: [a,b]
+  items:
+     - item: 2300
+       unitvalue: 1.10
+       units: 10000
+       trans:
+        - in: c
+          next: A
+     - item: 2343
+       unitvalue: 23.20
+       units: 2000
+       trans:
+        - in: d
+          next: A
+- invoice: 130
+  client: "Alejandro Gil"
+  alpha: [a,b,c]
+  items:
+     - item: 3100
+       unitvalue: 3.45
+       units: 10
+       trans:
+        - in: a
+          next: A
+     - item: 3400
+       unitvalue: 124.00
+       units: 20
+       trans:
+        - in: b
+          next: B
+

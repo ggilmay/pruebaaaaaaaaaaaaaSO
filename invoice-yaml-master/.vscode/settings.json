@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "invoice.C": "cpp",
+        "invoiceYaml.C": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "string": "cpp",
+        "xstring": "cpp",
+        "vector": "cpp",
+        "xlocale": "cpp",
+        "iosfwd": "cpp",
+        "system_error": "cpp",
+        "automata.C": "cpp"
+    }
+}
