@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <unistd.h>
 #include <string>
 #include <cstdlib>
 #include <vector>
@@ -8,10 +9,20 @@
 #include <map>
 #include <string> 
 #include <thread>
+#include <pthread.h> 
+#include <semaphore.h>
+#include <algorithm> 
 #include "automata.h"
 #include "automat.h"
+#include "sisctrl.h"
 
 using namespace std;
+
+vector<automat> ats;
+int y;
+sem_t mutex;
+map<string, string> m;
+map<string, string> msg;
 
 void operator >> (const YAML::Node& node, tran& tran) {
   string in;
@@ -84,7 +95,6 @@ parserAutomatasFile(char *filename) {
 
 void
 readParser(automatas& inv) {
-  vector<automat> ats;
   for(i_automatas it = inv.begin(); it != inv.end(); ++it) {
     //if(ids == (*it).getId()){
       automat automatss;
@@ -126,23 +136,74 @@ usage(const char* name) {
   exit(0);
 }
 
-void
-checkStates(vector<delts> deltas) {
+void*
+checkStates(void* ) {
+  sem_wait(&mutex);
+  cout << "Padre:  "<< getppid() << endl; 
+  for(int i=0;i<ats.at(y).delte.size();i++) // loop will run n times (n=5) 
+    { 
+        if(fork() == 0) 
+        { 
+            cout << "- node: " << ats.at(y).delte.at(i).node << endl;
+            cout << "  pid: " << getpid() << endl;
+            exit(0); 
+        } 
+    } 
+    y++;
+    sem_post(&mutex); 
+}
 
+string removeSpacess(string str)  
+{ 
+    
+    str.erase(remove(str.begin(), str.end(), ' '), str.end()); 
+    return str; 
+} 
+
+void readMessage() {
+  string name;
+  string mensajes[2];
+  int i = 0;
+  //std::cout << "Please, enter your full name: ";
+  getline (cin,name);
+  stringstream x(name);
+  getline(x, name, ':');
+  getline(x, name, ' ');
+  name = removeSpacess(name);
+  getline(x, name, ','); 
+  m["cmd"] = name;
+  getline(x, name, ':');
+  getline(x, name, ' ');
+  getline(x, name, '}');
+  m["msg"] = name;
 }
 
 int
 main(int argc, char *argv[]) {
 
-  vector<thread> hiloAutomatas;
+  sem_init(&mutex, 0, 1);
   //int ids = 0;
   //cin >> ids;
   if (argc != 2) {
     usage(argv[0]);
   }
-  cout << "Buenas" << endl;
   automatas& inv = parserAutomatasFile(argv[1]);
   readParser(inv);
+  readMessage();
+  cout << m["cmd"] << endl;
+  cout << m["msg"] << endl;
+  pthread_t hiloAutomatas[ats.size()];
+  for(int i=0;i<ats.size();i++) // loop will run n times (n=5) 
+    { 
+      if(pthread_create(&hiloAutomatas[i],NULL,checkStates,NULL) != 0) {
+        cerr << "No se pudo crear hilo: " << errno << endl;
+      _exit(1); 
+      }
+      //pthread_join(hiloAutomatas[i], 0);
+    }
+  for (int i=0;i<ats.size();i++) {
+    pthread_join(hiloAutomatas[i], NULL);
+  } 
   //for(int i = 0; i<ats.size(); i++) {
   //}
   //cout << ats.at(1).delte.at(1).node << endl;
